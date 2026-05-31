@@ -162,6 +162,7 @@ const baseStackInputSchema = z.object({
         name: z.string(),
         arn: z.string(),
         description: z.string().default(''),
+        display_name: z.string().optional(),
       })
     )
     .default([]),

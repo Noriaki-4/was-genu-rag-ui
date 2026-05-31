@@ -763,6 +763,13 @@ To add MCP servers, add them to the aforementioned `generic/mcp.json`.
 
 You can use externally created AgentCore Runtimes with `agentCoreExternalRuntimes`.
 
+Each entry supports the following fields:
+
+- `name` (required): Identifier for the runtime. AgentCore Runtime names only allow alphanumeric characters and underscores.
+- `arn` (required): ARN of the AgentCore Runtime.
+- `display_name` (optional): Display name shown in the UI. Useful when you want to show a more descriptive name (including non-ASCII characters such as Japanese) without changing the underlying `name`.
+- `description` (required): Description of the agent. Shown on the agent list page and at the top of the chat page so users can understand the role of each agent at a glance.
+
 When accessing services outside AWS from AgentCore Runtime, use AgentCore Gateway.
 By specifying the Gateway ARN in `agentCoreGatewayArns`, an IAM policy following the principle of least privilege will be configured.
 After configuration, use `mcp-proxy-for-aws` in the MCP settings to specify the endpoint.
@@ -801,6 +808,8 @@ const envs: Record<string, Partial<StackInput>> = {
     agentCoreExternalRuntimes: [
       {
         name: 'AgentCore1',
+        display_name: 'Customer Support Agent',
+        description: 'An agent that responds to customer inquiries.',
         arn: 'arn:aws:bedrock-agentcore:us-west-2:<account>:runtime/agent-core1-xxxxxxxx',
       },
     ],
@@ -823,6 +832,8 @@ const envs: Record<string, Partial<StackInput>> = {
     "agentCoreExternalRuntimes": [
       {
         "name": "AgentCore1",
+        "display_name": "Customer Support Agent",
+        "description": "An agent that responds to customer inquiries.",
         "arn": "arn:aws:bedrock-agentcore:us-west-2:<account>:runtime/agent-core1-xxxxxxxx"
       }
     ]
