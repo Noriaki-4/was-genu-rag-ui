@@ -1,10 +1,56 @@
 import * as lambda from 'aws-lambda';
-import { RetrieveCommand } from '@aws-sdk/client-bedrock-agent-runtime';
+import {
+  RetrievalFilter,
+  RetrieveCommand,
+} from '@aws-sdk/client-bedrock-agent-runtime';
 import { RetrieveKnowledgeBaseRequest } from 'generative-ai-use-cases';
 import { initBedrockAgentRuntimeClient } from './utils/bedrockClient';
+import {
+  getDynamicFilters,
+  hiddenStaticExplicitFilters,
+} from '@generative-ai-use-cases/common';
+import { CognitoIdTokenPayload } from 'aws-jwt-verify/jwt-model';
 
 const KNOWLEDGE_BASE_ID = process.env.KNOWLEDGE_BASE_ID;
 const MODEL_REGION = process.env.MODEL_REGION as string;
+
+const normalizeGroups = (groups: unknown): string[] | undefined => {
+  if (Array.isArray(groups)) {
+    return groups.filter((group): group is string => typeof group === 'string');
+  }
+  if (typeof groups === 'string') {
+    return groups
+      .replace(/^\[|\]$/g, '')
+      .split(',')
+      .map((group) => group.trim().replace(/^"|"$/g, ''))
+      .filter(Boolean);
+  }
+  return undefined;
+};
+
+const normalizePayload = (
+  payload?: CognitoIdTokenPayload
+): CognitoIdTokenPayload | undefined => {
+  if (!payload) return undefined;
+  const groups = normalizeGroups(payload['cognito:groups']);
+  return groups
+    ? ({ ...payload, 'cognito:groups': groups } as CognitoIdTokenPayload)
+    : payload;
+};
+
+const getExplicitFilters = (
+  payload?: CognitoIdTokenPayload
+): RetrievalFilter | undefined => {
+  const normalizedPayload = normalizePayload(payload);
+  if (!normalizedPayload) return undefined;
+  const aggregatedFilters: RetrievalFilter[] = [
+    ...hiddenStaticExplicitFilters,
+    ...getDynamicFilters(normalizedPayload),
+  ];
+  if (aggregatedFilters.length === 0) return undefined;
+  if (aggregatedFilters.length === 1) return aggregatedFilters[0];
+  return { andAll: aggregatedFilters };
+};
 
 export const handler = async (
   event: lambda.APIGatewayProxyEvent
@@ -24,6 +70,9 @@ export const handler = async (
   }
 
   const client = await initBedrockAgentRuntimeClient({ region: MODEL_REGION });
+  const explicitFilters = getExplicitFilters(
+    event.requestContext.authorizer?.claims as CognitoIdTokenPayload | undefined
+  );
   const retrieveCommand = new RetrieveCommand({
     knowledgeBaseId: KNOWLEDGE_BASE_ID,
     retrievalQuery: { text: query },
@@ -31,6 +80,7 @@ export const handler = async (
       vectorSearchConfiguration: {
         numberOfResults: 10,
         overrideSearchType: 'HYBRID',
+        filter: explicitFilters,
       },
     },
   });

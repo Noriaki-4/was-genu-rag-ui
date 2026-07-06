@@ -1,5 +1,6 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { fetchAuthSession } from 'aws-amplify/auth';
 import {
   PiList,
   PiHouse,
@@ -24,6 +25,7 @@ import {
   PiNotebook,
   PiGraph,
   PiMagnifyingGlass,
+  PiFolderOpen,
 } from 'react-icons/pi';
 import { Outlet } from 'react-router-dom';
 import Drawer, { ItemProps } from './components/Drawer';
@@ -42,6 +44,12 @@ import { useTranslation } from 'react-i18next';
 const ragEnabled: boolean = import.meta.env.VITE_APP_RAG_ENABLED === 'true';
 const ragKnowledgeBaseEnabled: boolean =
   import.meta.env.VITE_APP_RAG_KNOWLEDGE_BASE_ENABLED === 'true';
+const ragKnowledgeBaseAdminGroups = (
+  import.meta.env.VITE_APP_RAG_KNOWLEDGE_BASE_ADMIN_GROUPS || 'Admin'
+)
+  .split(',')
+  .map((group) => group.trim())
+  .filter(Boolean);
 const agentEnabled: boolean = import.meta.env.VITE_APP_AGENT_ENABLED === 'true';
 const inlineAgents: boolean = import.meta.env.VITE_APP_INLINE_AGENTS === 'true';
 const mcpEnabled: boolean = import.meta.env.VITE_APP_MCP_ENABLED === 'true';
@@ -70,6 +78,20 @@ const extractChatId = (path: string): string | null => {
   return match ? match[1] : null;
 };
 
+const getGroups = (groups: unknown): string[] => {
+  if (Array.isArray(groups)) {
+    return groups.filter((group): group is string => typeof group === 'string');
+  }
+  if (typeof groups === 'string') {
+    return groups
+      .replace(/^\[|\]$/g, '')
+      .split(',')
+      .map((group) => group.trim().replace(/^"|"$/g, ''))
+      .filter(Boolean);
+  }
+  return [];
+};
+
 const App: React.FC = () => {
   const { t } = useTranslation();
   const { switchOpen: switchDrawer, opened: isOpenDrawer } = useDrawer();
@@ -79,6 +101,37 @@ const App: React.FC = () => {
   const { screen, notifyScreen, scrollTopAnchorRef, scrollBottomAnchorRef } =
     useScreen();
   const { enabled } = useUseCases();
+  const [isRagKnowledgeBaseAdmin, setIsRagKnowledgeBaseAdmin] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!ragKnowledgeBaseEnabled) {
+      setIsRagKnowledgeBaseAdmin(false);
+      return;
+    }
+
+    fetchAuthSession()
+      .then((session) => {
+        const groups = getGroups(
+          session.tokens?.idToken?.payload['cognito:groups']
+        );
+        const isAdmin = groups.some((group) =>
+          ragKnowledgeBaseAdminGroups.includes(group)
+        );
+        if (mounted) {
+          setIsRagKnowledgeBaseAdmin(isAdmin);
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setIsRagKnowledgeBaseAdmin(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const items: ItemProps[] = [
     {
@@ -114,6 +167,15 @@ const App: React.FC = () => {
           to: '/rag-knowledge-base',
           icon: <PiChatCircleText />,
           display: 'usecase' as const,
+          sub: 'Knowledge Base',
+        }
+      : null,
+    ragKnowledgeBaseEnabled && isRagKnowledgeBaseAdmin
+      ? {
+          label: t('navigation.ragKnowledgeBaseAdmin'),
+          to: '/rag-knowledge-base/admin',
+          icon: <PiFolderOpen />,
+          display: 'tool' as const,
           sub: 'Knowledge Base',
         }
       : null,

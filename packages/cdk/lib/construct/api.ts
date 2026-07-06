@@ -60,6 +60,8 @@ export interface BackendApiProps {
   readonly table: Table;
   readonly statsTable: Table;
   readonly knowledgeBaseId?: string;
+  readonly knowledgeBaseDataSourceId?: string;
+  readonly knowledgeBaseAdminGroups?: string[];
   readonly agents?: string;
   readonly guardrailIdentify?: string;
   readonly guardrailVersion?: string;
@@ -183,6 +185,7 @@ export class Api extends Construct {
     // These are newer than the Lambda runtime's built-in SDK
     const bedrockSdkModules = [
       '@aws-sdk/client-bedrock-runtime',
+      '@aws-sdk/client-bedrock-agent',
       '@aws-sdk/client-bedrock-agent-runtime',
       '@aws-sdk/client-sagemaker-runtime',
     ];
@@ -231,6 +234,12 @@ export class Api extends Construct {
         TABLE_NAME: table.tableName,
         STATS_TABLE_NAME: props.statsTable.tableName,
         KNOWLEDGE_BASE_ID: knowledgeBaseId ?? '',
+        KNOWLEDGE_BASE_DATA_SOURCE_ID: props.knowledgeBaseDataSourceId ?? '',
+        KNOWLEDGE_BASE_DATA_SOURCE_BUCKET_NAME:
+          props.knowledgeBaseDataSourceBucketName ?? '',
+        KNOWLEDGE_BASE_ADMIN_GROUPS: (
+          props.knowledgeBaseAdminGroups ?? ['Admin']
+        ).join(','),
         VIDEO_BUCKET_REGION_MAP: JSON.stringify(props.videoBucketRegionMap),
         QUERY_DECOMPOSITION_ENABLED: JSON.stringify(queryDecompositionEnabled),
         RERANKING_MODEL_ID: rerankingModelId ?? '',
@@ -518,10 +527,37 @@ export class Api extends Construct {
 
     // Allow downloading files from Knowledge Base data source bucket
     if (props.knowledgeBaseDataSourceBucketName && apiHandler.role) {
+      apiHandler.role.addToPrincipalPolicy(
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: ['s3:ListBucket'],
+          resources: [
+            `arn:aws:s3:::${props.knowledgeBaseDataSourceBucketName}`,
+          ],
+        })
+      );
+      apiHandler.role.addToPrincipalPolicy(
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: ['s3:DeleteObject', 's3:DeleteObjectVersion'],
+          resources: [
+            `arn:aws:s3:::${props.knowledgeBaseDataSourceBucketName}/*`,
+          ],
+        })
+      );
       allowS3AccessWithSourceIpCondition(
         props.knowledgeBaseDataSourceBucketName,
         apiHandler.role,
         'read',
+        {
+          ipv4: props.allowedIpV4AddressRanges || [],
+          ipv6: props.allowedIpV6AddressRanges || [],
+        }
+      );
+      allowS3AccessWithSourceIpCondition(
+        props.knowledgeBaseDataSourceBucketName,
+        apiHandler.role,
+        'write',
         {
           ipv4: props.allowedIpV4AddressRanges || [],
           ipv6: props.allowedIpV6AddressRanges || [],

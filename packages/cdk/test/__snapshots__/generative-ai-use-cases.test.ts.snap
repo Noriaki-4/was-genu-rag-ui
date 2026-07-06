@@ -2592,6 +2592,17 @@ exports[`GenerativeAiUseCases matches the snapshot (closed network mode) 1`] = `
 exports[`GenerativeAiUseCases matches the snapshot (closed network mode) 2`] = `
 {
   "Outputs": {
+    "ExportsOutputFnGetAttDataSourceDataSourceIdA5356048": {
+      "Export": {
+        "Name": "RagKnowledgeBaseStack:ExportsOutputFnGetAttDataSourceDataSourceIdA5356048",
+      },
+      "Value": {
+        "Fn::GetAtt": [
+          "DataSource",
+          "DataSourceId",
+        ],
+      },
+    },
     "ExportsOutputRefDataSourceBucket9FA93E04BB6984D1": {
       "Export": {
         "Name": "RagKnowledgeBaseStack:ExportsOutputRefDataSourceBucket9FA93E04BB6984D1",
@@ -3159,6 +3170,26 @@ exports[`GenerativeAiUseCases matches the snapshot (closed network mode) 2`] = `
               "ServerSideEncryptionByDefault": {
                 "SSEAlgorithm": "AES256",
               },
+            },
+          ],
+        },
+        "CorsConfiguration": {
+          "CorsRules": [
+            {
+              "AllowedHeaders": [
+                "*",
+              ],
+              "AllowedMethods": [
+                "GET",
+                "PUT",
+              ],
+              "AllowedOrigins": [
+                "*",
+              ],
+              "ExposedHeaders": [
+                "ETag",
+              ],
+              "MaxAge": 3000,
             },
           ],
         },
@@ -6081,6 +6112,13 @@ exports[`GenerativeAiUseCases matches the snapshot (closed network mode) 6`] = `
             "INDEX_ID": {
               "Ref": "RagKendraIndexFEF3924C",
             },
+            "KNOWLEDGE_BASE_ADMIN_GROUPS": "Admin",
+            "KNOWLEDGE_BASE_DATA_SOURCE_BUCKET_NAME": {
+              "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefDataSourceBucket9FA93E04BB6984D1",
+            },
+            "KNOWLEDGE_BASE_DATA_SOURCE_ID": {
+              "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputFnGetAttDataSourceDataSourceIdA5356048",
+            },
             "KNOWLEDGE_BASE_ID": {
               "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefKnowledgeBaseD054384B",
             },
@@ -6478,11 +6516,6 @@ exports[`GenerativeAiUseCases matches the snapshot (closed network mode) 6`] = `
                 "s3:DeleteObject*",
                 "s3:PutObject*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
-                },
-              },
               "Effect": "Allow",
               "Resource": [
                 {
@@ -6553,11 +6586,6 @@ exports[`GenerativeAiUseCases matches the snapshot (closed network mode) 6`] = `
                 "s3:GetObject*",
                 "s3:List*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
-                },
-              },
               "Effect": "Allow",
               "Resource": [
                 {
@@ -6655,11 +6683,6 @@ exports[`GenerativeAiUseCases matches the snapshot (closed network mode) 6`] = `
                 "s3:DeleteObject*",
                 "s3:PutObject*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
-                },
-              },
               "Effect": "Allow",
               "Resource": [
                 {
@@ -6693,11 +6716,6 @@ exports[`GenerativeAiUseCases matches the snapshot (closed network mode) 6`] = `
                 "s3:GetObject*",
                 "s3:List*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
-                },
-              },
               "Effect": "Allow",
               "Resource": [
                 {
@@ -6731,11 +6749,6 @@ exports[`GenerativeAiUseCases matches the snapshot (closed network mode) 6`] = `
                 "s3:GetObject*",
                 "s3:List*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
-                },
-              },
               "Effect": "Allow",
               "Resource": [
                 {
@@ -6782,16 +6795,78 @@ exports[`GenerativeAiUseCases matches the snapshot (closed network mode) 6`] = `
               },
             },
             {
+              "Action": "s3:ListBucket",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefDataSourceBucket9FA93E04BB6984D1",
+                    },
+                  ],
+                ],
+              },
+            },
+            {
+              "Action": [
+                "s3:DeleteObject",
+                "s3:DeleteObjectVersion",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefDataSourceBucket9FA93E04BB6984D1",
+                    },
+                    "/*",
+                  ],
+                ],
+              },
+            },
+            {
               "Action": [
                 "s3:GetBucket*",
                 "s3:GetObject*",
                 "s3:List*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefDataSourceBucket9FA93E04BB6984D1",
+                      },
+                    ],
+                  ],
                 },
-              },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefDataSourceBucket9FA93E04BB6984D1",
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "s3:Abort*",
+                "s3:DeleteObject*",
+                "s3:PutObject*",
+              ],
               "Effect": "Allow",
               "Resource": [
                 {
@@ -6825,11 +6900,6 @@ exports[`GenerativeAiUseCases matches the snapshot (closed network mode) 6`] = `
                 "s3:GetObject*",
                 "s3:List*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
-                },
-              },
               "Effect": "Allow",
               "Resource": [
                 {
@@ -13449,6 +13519,7 @@ exports[`GenerativeAiUseCases matches the snapshot (closed network mode) 6`] = `
             ],
           },
           "VITE_APP_RAG_ENABLED": "true",
+          "VITE_APP_RAG_KNOWLEDGE_BASE_ADMIN_GROUPS": "Admin",
           "VITE_APP_RAG_KNOWLEDGE_BASE_ENABLED": "true",
           "VITE_APP_REGION": "us-east-1",
           "VITE_APP_RESEARCH_AGENT_ENABLED": "false",
@@ -16507,6 +16578,17 @@ exports[`GenerativeAiUseCases matches the snapshot 1`] = `
 exports[`GenerativeAiUseCases matches the snapshot 2`] = `
 {
   "Outputs": {
+    "ExportsOutputFnGetAttDataSourceDataSourceIdA5356048": {
+      "Export": {
+        "Name": "RagKnowledgeBaseStack:ExportsOutputFnGetAttDataSourceDataSourceIdA5356048",
+      },
+      "Value": {
+        "Fn::GetAtt": [
+          "DataSource",
+          "DataSourceId",
+        ],
+      },
+    },
     "ExportsOutputRefDataSourceBucket9FA93E04BB6984D1": {
       "Export": {
         "Name": "RagKnowledgeBaseStack:ExportsOutputRefDataSourceBucket9FA93E04BB6984D1",
@@ -17074,6 +17156,26 @@ exports[`GenerativeAiUseCases matches the snapshot 2`] = `
               "ServerSideEncryptionByDefault": {
                 "SSEAlgorithm": "AES256",
               },
+            },
+          ],
+        },
+        "CorsConfiguration": {
+          "CorsRules": [
+            {
+              "AllowedHeaders": [
+                "*",
+              ],
+              "AllowedMethods": [
+                "GET",
+                "PUT",
+              ],
+              "AllowedOrigins": [
+                "*",
+              ],
+              "ExposedHeaders": [
+                "ETag",
+              ],
+              "MaxAge": 3000,
             },
           ],
         },
@@ -19916,6 +20018,13 @@ exports[`GenerativeAiUseCases matches the snapshot 6`] = `
             "INDEX_ID": {
               "Ref": "RagKendraIndexFEF3924C",
             },
+            "KNOWLEDGE_BASE_ADMIN_GROUPS": "Admin",
+            "KNOWLEDGE_BASE_DATA_SOURCE_BUCKET_NAME": {
+              "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefDataSourceBucket9FA93E04BB6984D1",
+            },
+            "KNOWLEDGE_BASE_DATA_SOURCE_ID": {
+              "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputFnGetAttDataSourceDataSourceIdA5356048",
+            },
             "KNOWLEDGE_BASE_ID": {
               "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefKnowledgeBaseD054384B",
             },
@@ -20283,11 +20392,6 @@ exports[`GenerativeAiUseCases matches the snapshot 6`] = `
                 "s3:DeleteObject*",
                 "s3:PutObject*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
-                },
-              },
               "Effect": "Allow",
               "Resource": [
                 {
@@ -20358,11 +20462,6 @@ exports[`GenerativeAiUseCases matches the snapshot 6`] = `
                 "s3:GetObject*",
                 "s3:List*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
-                },
-              },
               "Effect": "Allow",
               "Resource": [
                 {
@@ -20460,11 +20559,6 @@ exports[`GenerativeAiUseCases matches the snapshot 6`] = `
                 "s3:DeleteObject*",
                 "s3:PutObject*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
-                },
-              },
               "Effect": "Allow",
               "Resource": [
                 {
@@ -20498,11 +20592,6 @@ exports[`GenerativeAiUseCases matches the snapshot 6`] = `
                 "s3:GetObject*",
                 "s3:List*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
-                },
-              },
               "Effect": "Allow",
               "Resource": [
                 {
@@ -20536,11 +20625,6 @@ exports[`GenerativeAiUseCases matches the snapshot 6`] = `
                 "s3:GetObject*",
                 "s3:List*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
-                },
-              },
               "Effect": "Allow",
               "Resource": [
                 {
@@ -20587,16 +20671,78 @@ exports[`GenerativeAiUseCases matches the snapshot 6`] = `
               },
             },
             {
+              "Action": "s3:ListBucket",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefDataSourceBucket9FA93E04BB6984D1",
+                    },
+                  ],
+                ],
+              },
+            },
+            {
+              "Action": [
+                "s3:DeleteObject",
+                "s3:DeleteObjectVersion",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefDataSourceBucket9FA93E04BB6984D1",
+                    },
+                    "/*",
+                  ],
+                ],
+              },
+            },
+            {
               "Action": [
                 "s3:GetBucket*",
                 "s3:GetObject*",
                 "s3:List*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefDataSourceBucket9FA93E04BB6984D1",
+                      },
+                    ],
+                  ],
                 },
-              },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefDataSourceBucket9FA93E04BB6984D1",
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "s3:Abort*",
+                "s3:DeleteObject*",
+                "s3:PutObject*",
+              ],
               "Effect": "Allow",
               "Resource": [
                 {
@@ -20630,11 +20776,6 @@ exports[`GenerativeAiUseCases matches the snapshot 6`] = `
                 "s3:GetObject*",
                 "s3:List*",
               ],
-              "Condition": {
-                "IpAddress": {
-                  "aws:SourceIp": [],
-                },
-              },
               "Effect": "Allow",
               "Resource": [
                 {
@@ -27137,6 +27278,7 @@ exports[`GenerativeAiUseCases matches the snapshot 6`] = `
             ],
           },
           "VITE_APP_RAG_ENABLED": "true",
+          "VITE_APP_RAG_KNOWLEDGE_BASE_ADMIN_GROUPS": "Admin",
           "VITE_APP_RAG_KNOWLEDGE_BASE_ENABLED": "true",
           "VITE_APP_REGION": "us-east-1",
           "VITE_APP_RESEARCH_AGENT_ENABLED": "false",

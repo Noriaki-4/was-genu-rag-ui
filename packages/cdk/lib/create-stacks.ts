@@ -166,6 +166,7 @@ export const createStacks = (app: cdk.App, params: ProcessedStackInput) => {
       crossRegionReferences: true,
       // RAG Knowledge Base
       knowledgeBaseId: ragKnowledgeBaseStack?.knowledgeBaseId,
+      knowledgeBaseDataSourceId: ragKnowledgeBaseStack?.dataSourceId,
       knowledgeBaseDataSourceBucketName:
         ragKnowledgeBaseStack?.dataSourceBucketName,
       agentStack: agentStack || undefined,

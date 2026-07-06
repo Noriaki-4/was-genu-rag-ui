@@ -780,6 +780,7 @@ navigation:
   meetingMinutes: 議事録生成
   promptOptimization: プロンプト最適化
   ragChat: RAG チャット
+  ragKnowledgeBaseAdmin: ナレッジ管理
   settings: 設定
   speechRecognition: 音声認識
   summary: 要約
@@ -799,6 +800,42 @@ optimizePrompt:
   result_placeholder: 結果がここに表示されます
   title: プロンプト最適化
 rag:
+  admin:
+    all_files: すべてのファイル
+    delete: 削除
+    delete_confirm: 選択したファイルを削除しますか？
+    delete_done: ファイルを削除しました
+    delete_failed: ファイルの削除に失敗しました
+    drive_org: 組織
+    drive_private: 個人
+    drive_shared: 共有
+    drop_files: ここにファイルをドロップ
+    file: ファイル
+    file_count: '{{count}} 件'
+    folders: フォルダ
+    latest_sync: '最新同期: {{status}}'
+    no_files: ファイルがありません
+    no_supported_files: 対応ファイルがありません
+    no_sync: 同期ジョブはありません
+    queue_done: '完了: {{count}}'
+    queue_empty: アップロードはありません
+    queue_error: 'エラー: {{count}}'
+    queue_queued: '待機: {{count}}'
+    queue_uploading: '処理中: {{count}}'
+    refresh: 更新
+    search: ファイル検索
+    select_files: ファイル
+    select_folder: フォルダ
+    size: サイズ
+    sync: 同期
+    sync_failed: 同期開始に失敗しました
+    sync_history: 同期履歴
+    sync_started: 同期を開始しました
+    title: ナレッジ管理
+    updated_at: 更新日時
+    upload_failed: アップロードに失敗しました
+    upload_queue: アップロードキュー
+    uploading: アップロード中...
   can_add_filters: をカスタマイズすることでフィルターを追加できます。
   errorRetrieval: >-
     Kendra から参考ドキュメントを取得できませんでした。以下をご確認ください： - Amazon Kendra

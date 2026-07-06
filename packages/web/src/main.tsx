@@ -21,6 +21,7 @@ import VideoAnalyzerPage from './pages/VideoAnalyzerPage';
 import NotFound from './pages/NotFound';
 import RagPage from './pages/RagPage';
 import RagKnowledgeBasePage from './pages/RagKnowledgeBasePage';
+import RagKnowledgeBaseAdminPage from './pages/RagKnowledgeBaseAdminPage';
 import WebContent from './pages/WebContent';
 import GenerateImagePage from './pages/GenerateImagePage';
 import GenerateVideoPage from './pages/GenerateVideoPage';
@@ -185,6 +186,12 @@ const routes: RouteObject[] = [
     ? {
         path: '/rag-knowledge-base',
         element: <RagKnowledgeBasePage />,
+      }
+    : null,
+  ragKnowledgeBaseEnabled
+    ? {
+        path: '/rag-knowledge-base/admin',
+        element: <RagKnowledgeBaseAdminPage />,
       }
     : null,
   agentEnabled

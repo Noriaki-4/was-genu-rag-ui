@@ -36,6 +36,7 @@ export interface GenerativeAiUseCasesStackProps extends StackProps {
   readonly params: ProcessedStackInput;
   // RAG Knowledge Base
   readonly knowledgeBaseId?: string;
+  readonly knowledgeBaseDataSourceId?: string;
   readonly knowledgeBaseDataSourceBucketName?: string;
   // Agent
   readonly agentStack?: Stack;
@@ -226,6 +227,9 @@ export class GenerativeAiUseCasesStack extends Stack {
       table: database.table,
       statsTable: database.statsTable,
       knowledgeBaseId: params.ragKnowledgeBaseId || props.knowledgeBaseId,
+      knowledgeBaseDataSourceId:
+        params.ragKnowledgeBaseDataSourceId || props.knowledgeBaseDataSourceId,
+      knowledgeBaseAdminGroups: params.ragKnowledgeBaseAdminGroups,
       agents: agentsJson,
       guardrailIdentify: props.guardrailIdentifier,
       guardrailVersion: props.guardrailVersion,
@@ -260,6 +264,7 @@ export class GenerativeAiUseCasesStack extends Stack {
       ].filter(Boolean),
       // Knowledge Base data source bucket
       knowledgeBaseDataSourceBucketName:
+        params.ragKnowledgeBaseDataSourceBucketName ||
         props.knowledgeBaseDataSourceBucketName,
       dataSourceBucketName: rag?.dataSourceBucketName,
     });
@@ -340,6 +345,7 @@ export class GenerativeAiUseCasesStack extends Stack {
       predictStreamFunctionArn: api.predictStreamFunction.functionArn,
       ragEnabled: params.ragEnabled,
       ragKnowledgeBaseEnabled: params.ragKnowledgeBaseEnabled,
+      ragKnowledgeBaseAdminGroups: params.ragKnowledgeBaseAdminGroups,
       agentEnabled: params.agentEnabled || params.agents.length > 0,
       flows: params.flows,
       flowStreamFunctionArn: api.invokeFlowFunction.functionArn,

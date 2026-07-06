@@ -70,6 +70,12 @@ export const implicitFilters: MetadataAttributeSchema[] = [
 // Filter not shown to user (i.e. application level permission, pool tenant)
 // Define filters that are not shown to user (i.e. application level permission, pool tenant)
 export const hiddenStaticExplicitFilters: RetrievalFilter[] = [
+  {
+    notIn: {
+      key: 'drive',
+      value: ['private'],
+    },
+  },
   // Example 1: Filter by data classification
   // {
   //   notIn: {
@@ -139,6 +145,24 @@ export const userDefinedExplicitFilters: ExplicitFilterConfiguration[] = [
       { value: 'ja', label: 'Japanese' },
     ],
     description: 'Language',
+  },
+
+  // Example 6: Filter by uploaded drive
+  {
+    key: 'drive',
+    type: 'STRING',
+    options: [
+      { value: 'org', label: 'Organization' },
+      { value: 'shared', label: 'Shared' },
+    ],
+    description: 'Drive',
+  },
+
+  // Example 7: Filter by uploaded folder path
+  {
+    key: 'folder_path',
+    type: 'STRING',
+    description: 'Folder Path',
   },
 
   // Customize Here

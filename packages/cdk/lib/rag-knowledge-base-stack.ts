@@ -132,6 +132,7 @@ export interface RagKnowledgeBaseStackProps extends StackProps {
 
 export class RagKnowledgeBaseStack extends Stack {
   public readonly knowledgeBaseId: string;
+  public readonly dataSourceId: string;
   public readonly dataSourceBucketName: string;
 
   constructor(scope: Construct, id: string, props: RagKnowledgeBaseStackProps) {
@@ -359,6 +360,13 @@ export class RagKnowledgeBaseStack extends Stack {
       serverAccessLogsPrefix: 'AccessLogs/',
       enforceSSL: true,
     });
+    dataSourceBucket.addCorsRule({
+      allowedOrigins: ['*'],
+      allowedMethods: [s3.HttpMethods.GET, s3.HttpMethods.PUT],
+      allowedHeaders: ['*'],
+      exposedHeaders: ['ETag'],
+      maxAge: 3000,
+    });
 
     knowledgeBaseRole.addToPolicy(
       new iam.PolicyStatement({
@@ -424,7 +432,7 @@ export class RagKnowledgeBaseStack extends Stack {
       },
     });
 
-    new bedrock.CfnDataSource(this, 'DataSource', {
+    const s3DataSource = new bedrock.CfnDataSource(this, 'DataSource', {
       dataSourceConfiguration: {
         s3Configuration: {
           bucketArn: `arn:aws:s3:::${dataSourceBucket.bucketName}`,
@@ -536,6 +544,7 @@ export class RagKnowledgeBaseStack extends Stack {
     });
 
     this.knowledgeBaseId = knowledgeBase.ref;
+    this.dataSourceId = s3DataSource.attrDataSourceId;
     this.dataSourceBucketName = dataSourceBucket.bucketName;
   }
 }

@@ -4,7 +4,8 @@ const createSourceIpCondition = (
   allowedIpV4AddressRanges?: string[] | null,
   allowedIpV6AddressRanges?: string[] | null
 ) =>
-  allowedIpV4AddressRanges || allowedIpV6AddressRanges
+  (allowedIpV4AddressRanges?.length ?? 0) > 0 ||
+  (allowedIpV6AddressRanges?.length ?? 0) > 0
     ? {
         IpAddress: {
           'aws:SourceIp': [

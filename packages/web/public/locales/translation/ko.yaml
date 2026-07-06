@@ -500,6 +500,7 @@ navigation:
   meetingMinutes: 회의록
   promptOptimization: 프롬프트 최적화
   ragChat: RAG 채팅
+  ragKnowledgeBaseAdmin: Knowledge Management
   settings: 설정
   speechRecognition: 음성 인식
   summary: 요약
@@ -521,6 +522,42 @@ optimizePrompt:
   result_placeholder: 결과가 여기에 표시됩니다
   title: 프롬프트 최적화
 rag:
+  admin:
+    all_files: All files
+    delete: Delete
+    delete_confirm: Delete selected files?
+    delete_done: Files deleted
+    delete_failed: Failed to delete files
+    drive_org: Organization
+    drive_private: Private
+    drive_shared: Shared
+    drop_files: Drop files here
+    file: File
+    file_count: '{{count}} files'
+    folders: Folders
+    latest_sync: 'Latest sync: {{status}}'
+    no_files: No files
+    no_supported_files: No supported files
+    no_sync: No sync jobs
+    queue_done: 'Done: {{count}}'
+    queue_empty: No uploads
+    queue_error: 'Errors: {{count}}'
+    queue_queued: 'Queued: {{count}}'
+    queue_uploading: 'Uploading: {{count}}'
+    refresh: Refresh
+    search: Search files
+    select_files: Files
+    select_folder: Folder
+    size: Size
+    sync: Sync
+    sync_failed: Failed to start sync
+    sync_history: Sync history
+    sync_started: Sync started
+    title: Knowledge Management
+    updated_at: Updated
+    upload_failed: Upload failed
+    upload_queue: Upload queue
+    uploading: Uploading...
   can_add_filters: .
   errorRetrieval: >-
     Kendra에서 참조 문서를 검색하지 못했습니다. 다음 사항을 확인해주세요:

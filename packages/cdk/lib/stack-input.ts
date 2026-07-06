@@ -121,6 +121,9 @@ const baseStackInputSchema = z.object({
   // RAG KB
   ragKnowledgeBaseEnabled: z.boolean().default(false),
   ragKnowledgeBaseId: z.string().nullish(),
+  ragKnowledgeBaseDataSourceId: z.string().nullish(),
+  ragKnowledgeBaseDataSourceBucketName: z.string().nullish(),
+  ragKnowledgeBaseAdminGroups: z.array(z.string()).default(['Admin']),
   embeddingModelId: z.string().default('amazon.titan-embed-text-v2:0'),
   ragKnowledgeBaseStandbyReplicas: z.boolean().default(false),
   ragKnowledgeBaseAdvancedParsing: z.boolean().default(false),
